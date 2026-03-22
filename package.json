@@ -1,0 +1,16 @@
+{
+  "name": "deevya-portfolio",
+  "version": "1.0.0",
+  "description": "Deevya Patel Portfolio with Netlify Functions backend",
+  "scripts": {
+    "dev": "netlify dev",
+    "build": "echo 'No build step needed'"
+  },
+  "dependencies": {
+    "nodemailer": "^6.9.9",
+    "@anthropic-ai/sdk": "^0.20.0"
+  },
+  "devDependencies": {
+    "netlify-cli": "^17.0.0"
+  }
+}

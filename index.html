@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DEEVYA PATEL // SOFTWARE ENGINEER</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Exo+2:wght@100;200;300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cyan: #00f5ff;
+    --cyan-dim: #00b8c4;
+    --cyan-dark: #003d42;
+    --magenta: #ff006e;
+    --magenta-dim: #cc0058;
+    --yellow: #ffd60a;
+    --bg: #020912;
+    --bg2: #060f1e;
+    --bg3: #0a1628;
+    --grid: rgba(0,245,255,0.04);
+    --text: #c8e6f0;
+    --text-dim: #5a8a9a;
+    --border: rgba(0,245,255,0.15);
+    --border-bright: rgba(0,245,255,0.4);
+    --glow: 0 0 20px rgba(0,245,255,0.3);
+    --glow-strong: 0 0 40px rgba(0,245,255,0.5);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: none;
+  }
+  #cursor {
+    position: fixed; width: 20px; height: 20px;
+    border: 1px solid var(--cyan); border-radius: 50%;
+    pointer-events: none; z-index: 9999;
+    transform: translate(-50%,-50%);
+    transition: transform 0.1s, width 0.2s, height 0.2s, background 0.2s;
+    mix-blend-mode: screen;
+  }
+  #cursor-dot {
+    position: fixed; width: 4px; height: 4px;
+    background: var(--cyan); border-radius: 50%;
+    pointer-events: none; z-index: 9999;
+    transform: translate(-50%,-50%);
+  }
+  body:has(a:hover) #cursor, body:has(button:hover) #cursor {
+    width: 40px; height: 40px; background: rgba(0,245,255,0.1);
+  }
+  #starfield { position: fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none; }
+  body::before {
+    content:''; position:fixed; inset:0;
+    background-image: linear-gradient(var(--grid) 1px,transparent 1px), linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+    background-size: 60px 60px; z-index:1; pointer-events:none;
+  }
+  body::after {
+    content:''; position:fixed; inset:0;
+    background: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px);
+    z-index:2; pointer-events:none;
+  }
+  nav {
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:1.2rem 4rem;
+    background: linear-gradient(to bottom,rgba(2,9,18,0.95),transparent);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo { font-family:'Share Tech Mono',monospace; font-size:0.85rem; color:var(--cyan); letter-spacing:0.3em; text-transform:uppercase; }
+  .nav-logo span { color:var(--magenta); }
+  .nav-links { display:flex; gap:2.5rem; list-style:none; }
+  .nav-links a {
+    font-family:'Rajdhani',sans-serif; font-weight:600; font-size:0.8rem;
+    letter-spacing:0.2em; text-decoration:none; color:var(--text-dim);
+    text-transform:uppercase; position:relative; transition:color 0.2s;
+  }
+  .nav-links a::after { content:''; position:absolute; bottom:-4px; left:0; width:0; height:1px; background:var(--cyan); transition:width 0.3s; }
+  .nav-links a:hover { color:var(--cyan); }
+  .nav-links a:hover::after { width:100%; }
+  .nav-status { font-family:'Share Tech Mono',monospace; font-size:0.7rem; color:var(--text-dim); display:flex; align-items:center; gap:0.5rem; }
+  .status-dot { width:6px; height:6px; background:#00ff88; border-radius:50%; animation:pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;box-shadow:0 0 6px #00ff88;}50%{opacity:0.4;box-shadow:none;} }
+
+  section { position:relative; z-index:10; padding:0 4rem; }
+
+  /* HERO */
+  #hero { min-height:100vh; display:flex; flex-direction:column; justify-content:center; padding-top:6rem; padding-bottom:4rem; }
+  .hero-label { font-family:'Share Tech Mono',monospace; font-size:0.7rem; color:var(--cyan); letter-spacing:0.4em; text-transform:uppercase; margin-bottom:1.5rem; opacity:0; animation:fadeUp 0.8s 0.3s forwards; }
+  .hero-name { font-family:'Rajdhani',sans-serif; font-weight:700; font-size:clamp(3.5rem,9vw,8.5rem); line-height:0.9; letter-spacing:-0.02em; color:#fff; opacity:0; animation:fadeUp 0.8s 0.5s forwards; }
+  .hero-name .cyan { color:var(--cyan); text-shadow:var(--glow); }
+  .hero-subtitle { font-family:'Exo 2',sans-serif; font-weight:100; font-size:clamp(0.9rem,2.2vw,1.4rem); color:var(--text-dim); letter-spacing:0.15em; margin-top:1rem; opacity:0; animation:fadeUp 0.8s 0.7s forwards; }
+  .hero-desc { max-width:520px; font-size:0.95rem; line-height:1.8; color:var(--text-dim); margin-top:2rem; opacity:0; animation:fadeUp 0.8s 0.9s forwards; }
+  .hero-badges { display:flex; gap:0.7rem; flex-wrap:wrap; margin-top:1.5rem; opacity:0; animation:fadeUp 0.8s 1s forwards; }
+  .badge {
+    font-family:'Share Tech Mono',monospace; font-size:0.65rem; padding:0.35rem 0.8rem;
+    border:1px solid rgba(255,214,10,0.4); color:#ffd60a; background:rgba(255,214,10,0.06);
+    letter-spacing:0.1em; text-transform:uppercase;
+  }
+  .hero-actions { display:flex; gap:1.2rem; margin-top:2.5rem; opacity:0; animation:fadeUp 0.8s 1.1s forwards; }
+  .btn-primary {
+    font-family:'Rajdhani',sans-serif; font-weight:600; font-size:0.85rem; letter-spacing:0.2em;
+    text-transform:uppercase; padding:0.9rem 2.5rem; background:transparent; border:1px solid var(--cyan);
+    color:var(--cyan); cursor:pointer; position:relative; overflow:hidden; transition:color 0.3s;
+    clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);
+  }
+  .btn-primary::before { content:''; position:absolute; inset:0; background:var(--cyan); transform:translateX(-100%); transition:transform 0.3s; z-index:-1; }
+  .btn-primary:hover { color:var(--bg); }
+  .btn-primary:hover::before { transform:translateX(0); }
+  .btn-secondary {
+    font-family:'Rajdhani',sans-serif; font-weight:600; font-size:0.85rem; letter-spacing:0.2em;
+    text-transform:uppercase; padding:0.9rem 2.5rem; background:transparent; border:1px solid var(--border);
+    color:var(--text-dim); cursor:pointer; transition:border-color 0.3s,color 0.3s;
+    clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);
+  }
+  .btn-secondary:hover { border-color:var(--cyan-dim); color:var(--cyan); }
+  .hero-stats { display:flex; gap:3rem; margin-top:4rem; padding-top:2rem; border-top:1px solid var(--border); opacity:0; animation:fadeUp 0.8s 1.3s forwards; }
+  .stat-num { font-family:'Share Tech Mono',monospace; font-size:1.8rem; color:var(--cyan); text-shadow:var(--glow); }
+  .stat-label { font-size:0.72rem; letter-spacing:0.15em; color:var(--text-dim); text-transform:uppercase; margin-top:0.2rem; }
+  .hero-hex { position:absolute; right:4rem; top:50%; transform:translateY(-50%); width:380px; height:380px; opacity:0; animation:fadeIn 1.5s 0.8s forwards; }
+  .scroll-indicator { position:absolute; bottom:2rem; left:50%; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:0.5rem; animation:fadeIn 1s 2s both; }
+  .scroll-text { font-family:'Share Tech Mono',monospace; font-size:0.6rem; letter-spacing:0.3em; color:var(--text-dim); text-transform:uppercase; }
+  .scroll-line { width:1px; height:40px; background:linear-gradient(to bottom,var(--cyan),transparent); animation:scrollPulse 2s infinite; }
+
+  @keyframes fadeUp { to{opacity:1;transform:translateY(0);}from{opacity:0;transform:translateY(24px);} }
+  @keyframes fadeIn { to{opacity:1;}from{opacity:0;} }
+  @keyframes spin { to{transform:rotate(360deg);} }
+  @keyframes spinRev { to{transform:rotate(-360deg);} }
+  @keyframes scrollPulse { 0%,100%{opacity:1;transform:scaleY(1);}50%{opacity:0.3;transform:scaleY(0.5);} }
+
+  .glitch { position:relative; display:inline-block; }
+  .glitch::before,.glitch::after { content:attr(data-text); position:absolute; top:0; left:0; width:100%; font:inherit; }
+  .glitch::before { color:var(--cyan); clip-path:polygon(0 30%,100% 30%,100% 50%,0 50%); transform:translateX(-2px); animation:glitch1 4s infinite; }
+  .glitch::after { color:var(--magenta); clip-path:polygon(0 60%,100% 60%,100% 80%,0 80%); transform:translateX(2px); animation:glitch2 4s infinite; }
+  @keyframes glitch1 { 0%,90%,100%{transform:translateX(-2px);clip-path:polygon(0 30%,100% 30%,100% 50%,0 50%);}91%{transform:translateX(4px);clip-path:polygon(0 10%,100% 10%,100% 40%,0 40%);}93%{transform:translateX(-1px);clip-path:polygon(0 50%,100% 50%,100% 70%,0 70%);} }
+  @keyframes glitch2 { 0%,90%,100%{transform:translateX(2px);clip-path:polygon(0 60%,100% 60%,100% 80%,0 80%);}92%{transform:translateX(-4px);clip-path:polygon(0 20%,100% 20%,100% 45%,0 45%);}94%{transform:translateX(1px);clip-path:polygon(0 55%,100% 55%,100% 75%,0 75%);} }
+
+  .section-header { display:flex; align-items:center; gap:1rem; margin-bottom:3rem; padding-top:6rem; }
+  .section-number { font-family:'Share Tech Mono',monospace; font-size:0.7rem; color:var(--magenta); letter-spacing:0.3em; }
+  .section-line { width:60px; height:1px; background:var(--border); }
+  .section-title { font-family:'Rajdhani',sans-serif; font-weight:700; font-size:1.8rem; letter-spacing:0.1em; text-transform:uppercase; color:#fff; }
+
+  /* ABOUT */
+  #about { min-height:auto; padding-bottom:6rem; }
+  .about-grid { display:grid; grid-template-columns:1fr 1fr; gap:4rem; align-items:start; }
+  .about-text p { font-size:1rem; line-height:1.9; color:var(--text-dim); margin-bottom:1.2rem; }
+  .about-text p strong { color:var(--cyan); font-weight:400; }
+  .skills-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.8rem; }
+  .skill-tag {
+    font-family:'Share Tech Mono',monospace; font-size:0.72rem; padding:0.5rem 0.8rem;
+    border:1px solid var(--border); color:var(--text-dim); background:rgba(0,245,255,0.02);
+    letter-spacing:0.1em; transition:border-color 0.3s,color 0.3s,background 0.3s;
+  }
+  .skill-tag:hover { border-color:var(--cyan); color:var(--cyan); background:rgba(0,245,255,0.06); }
+  .skill-tag.hot { border-color:var(--magenta); color:var(--magenta); background:rgba(255,0,110,0.04); }
+
+  /* PROJECTS */
+  #projects { min-height:auto; padding-bottom:6rem; }
+  .projects-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; }
+  .project-card {
+    border:1px solid var(--border); background:var(--bg2); padding:2rem;
+    position:relative; overflow:hidden; transition:border-color 0.3s,transform 0.3s;
+    clip-path:polygon(0 0,calc(100% - 20px) 0,100% 20px,100% 100%,20px 100%,0 calc(100% - 20px));
+  }
+  .project-card::before { content:''; position:absolute; top:0; right:0; width:0; height:0; border-style:solid; border-width:0 20px 20px 0; border-color:transparent var(--cyan-dark) transparent transparent; }
+  .project-card:hover { border-color:var(--cyan); transform:translateY(-4px); box-shadow:var(--glow); }
+  .project-number { font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:var(--text-dim); letter-spacing:0.2em; margin-bottom:1rem; }
+  .project-title { font-family:'Rajdhani',sans-serif; font-weight:700; font-size:1.2rem; letter-spacing:0.05em; color:#fff; margin-bottom:0.8rem; }
+  .project-desc { font-size:0.85rem; line-height:1.7; color:var(--text-dim); margin-bottom:1.5rem; }
+  .project-tags { display:flex; flex-wrap:wrap; gap:0.4rem; margin-bottom:1.5rem; }
+  .ptag { font-family:'Share Tech Mono',monospace; font-size:0.65rem; padding:0.25rem 0.6rem; background:rgba(0,245,255,0.08); border:1px solid var(--cyan-dark); color:var(--cyan-dim); letter-spacing:0.05em; }
+  .project-link { font-family:'Rajdhani',sans-serif; font-weight:600; font-size:0.75rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--cyan); text-decoration:none; display:flex; align-items:center; gap:0.4rem; transition:gap 0.2s; }
+  .project-link:hover { gap:0.8rem; }
+  .coming-soon { font-family:'Share Tech Mono',monospace; font-size:0.68rem; padding:0.3rem 0.8rem; border:1px solid rgba(255,214,10,0.35); color:#ffd60a; background:rgba(255,214,10,0.05); letter-spacing:0.15em; display:inline-block; }
+
+  /* EXPERIENCE */
+  #experience { min-height:auto; padding-bottom:6rem; }
+  .timeline { position:relative; padding-left:2rem; }
+  .timeline::before { content:''; position:absolute; left:0; top:0; bottom:0; width:1px; background:linear-gradient(to bottom,var(--cyan),transparent); }
+  .timeline-item { position:relative; padding:0 0 3rem 2.5rem; }
+  .timeline-item::before { content:''; position:absolute; left:-5px; top:6px; width:10px; height:10px; border:1px solid var(--cyan); background:var(--bg); transform:rotate(45deg); }
+  .timeline-date { font-family:'Share Tech Mono',monospace; font-size:0.68rem; color:var(--magenta); letter-spacing:0.2em; margin-bottom:0.5rem; }
+  .timeline-role { font-family:'Rajdhani',sans-serif; font-weight:700; font-size:1.2rem; color:#fff; margin-bottom:0.25rem; }
+  .timeline-company { font-size:0.85rem; color:var(--cyan-dim); margin-bottom:0.8rem; }
+  .timeline-desc { font-size:0.85rem; line-height:1.8; color:var(--text-dim); }
+
+  /* EDUCATION */
+  #education { min-height:auto; padding-bottom:6rem; }
+  .edu-card {
+    border:1px solid var(--border); background:var(--bg2); padding:2rem 2.5rem;
+    max-width:700px; position:relative;
+    clip-path:polygon(0 0,calc(100% - 30px) 0,100% 30px,100% 100%,30px 100%,0 calc(100% - 30px));
+  }
+  .edu-card::before { content:''; position:absolute; top:0; right:0; width:0; height:0; border-style:solid; border-width:0 30px 30px 0; border-color:transparent var(--cyan-dark) transparent transparent; }
+  .edu-degree { font-family:'Rajdhani',sans-serif; font-weight:700; font-size:1.3rem; color:#fff; margin-bottom:0.4rem; }
+  .edu-school { font-size:0.95rem; color:var(--cyan-dim); margin-bottom:0.8rem; }
+  .edu-meta { display:flex; gap:1.5rem; flex-wrap:wrap; }
+  .edu-item { font-family:'Share Tech Mono',monospace; font-size:0.68rem; color:var(--text-dim); letter-spacing:0.1em; }
+  .edu-item strong { color:var(--yellow); font-weight:400; }
+  .honors { margin-top:1.2rem; display:flex; flex-wrap:wrap; gap:0.5rem; }
+  .honor-tag { font-family:'Share Tech Mono',monospace; font-size:0.62rem; padding:0.3rem 0.7rem; border:1px solid rgba(255,214,10,0.3); color:#ffd60a; background:rgba(255,214,10,0.04); letter-spacing:0.08em; }
+
+  /* AI CHATBOT */
+  #ai-chat { min-height:auto; padding-bottom:6rem; }
+  .chat-container { max-width:800px; border:1px solid var(--border); background:var(--bg2); clip-path:polygon(0 0,calc(100% - 30px) 0,100% 30px,100% 100%,30px 100%,0 calc(100% - 30px)); overflow:hidden; }
+  .chat-header { padding:1rem 1.5rem; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:0.8rem; background:var(--bg3); }
+  .chat-header-icon { width:32px; height:32px; border:1px solid var(--cyan); display:flex; align-items:center; justify-content:center; font-size:0.9rem; }
+  .chat-header-title { font-family:'Rajdhani',sans-serif; font-weight:700; font-size:0.9rem; letter-spacing:0.1em; color:var(--cyan); text-transform:uppercase; }
+  .chat-header-sub { font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:var(--text-dim); margin-left:auto; }
+  .chat-messages { height:360px; overflow-y:auto; padding:1.5rem; display:flex; flex-direction:column; gap:1rem; scroll-behavior:smooth; }
+  .chat-messages::-webkit-scrollbar { width:4px; }
+  .chat-messages::-webkit-scrollbar-track { background:transparent; }
+  .chat-messages::-webkit-scrollbar-thumb { background:var(--border); }
+  .msg { display:flex; flex-direction:column; gap:0.3rem; max-width:85%; animation:fadeUp 0.3s ease; }
+  .msg.user { align-self:flex-end; align-items:flex-end; }
+  .msg.assistant { align-self:flex-start; align-items:flex-start; }
+  .msg-label { font-family:'Share Tech Mono',monospace; font-size:0.6rem; letter-spacing:0.15em; text-transform:uppercase; }
+  .msg.user .msg-label { color:var(--magenta); }
+  .msg.assistant .msg-label { color:var(--cyan); }
+  .msg-bubble { padding:0.8rem 1rem; font-size:0.88rem; line-height:1.7; }
+  .msg.user .msg-bubble { background:rgba(255,0,110,0.08); border:1px solid rgba(255,0,110,0.25); color:var(--text); clip-path:polygon(0 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%); }
+  .msg.assistant .msg-bubble { background:rgba(0,245,255,0.05); border:1px solid var(--border); color:var(--text); clip-path:polygon(8px 0,100% 0,100% 100%,0 100%,0 8px); }
+  .typing-indicator { display:flex; align-items:center; gap:4px; padding:0.8rem 1rem; background:rgba(0,245,255,0.05); border:1px solid var(--border); width:fit-content; clip-path:polygon(8px 0,100% 0,100% 100%,0 100%,0 8px); }
+  .typing-indicator span { width:5px; height:5px; background:var(--cyan); border-radius:50%; animation:typing 1.2s infinite; }
+  .typing-indicator span:nth-child(2){animation-delay:0.2s;}
+  .typing-indicator span:nth-child(3){animation-delay:0.4s;}
+  @keyframes typing { 0%,60%,100%{opacity:0.3;transform:scale(1);}30%{opacity:1;transform:scale(1.3);} }
+  .chat-suggestions { padding:0.8rem 1.5rem; display:flex; flex-wrap:wrap; gap:0.5rem; border-top:1px solid var(--border); background:var(--bg3); }
+  .suggest-btn { font-family:'Share Tech Mono',monospace; font-size:0.65rem; padding:0.35rem 0.7rem; background:transparent; border:1px solid var(--border); color:var(--text-dim); cursor:pointer; letter-spacing:0.08em; transition:border-color 0.2s,color 0.2s; white-space:nowrap; }
+  .suggest-btn:hover { border-color:var(--cyan); color:var(--cyan); }
+  .chat-input-row { display:flex; border-top:1px solid var(--border); background:var(--bg3); }
+  .chat-input { flex:1; background:transparent; border:none; outline:none; padding:1rem 1.5rem; font-family:'Exo 2',sans-serif; font-size:0.88rem; color:var(--text); font-weight:300; }
+  .chat-input::placeholder { color:var(--text-dim); }
+  .chat-send { padding:1rem 1.5rem; background:transparent; border:none; border-left:1px solid var(--border); color:var(--cyan); cursor:pointer; font-family:'Rajdhani',sans-serif; font-weight:600; font-size:0.8rem; letter-spacing:0.15em; text-transform:uppercase; transition:background 0.2s; }
+  .chat-send:hover { background:rgba(0,245,255,0.08); }
+  .chat-send:disabled { opacity:0.4; cursor:not-allowed; }
+
+  /* CONTACT */
+  #contact { min-height:auto; padding-bottom:8rem; }
+  .contact-grid { display:grid; grid-template-columns:1fr 1fr; gap:4rem; align-items:start; }
+  .contact-text { font-size:0.95rem; line-height:1.9; color:var(--text-dim); }
+  .contact-links { display:flex; flex-direction:column; gap:1rem; margin-top:2rem; }
+  .contact-link { display:flex; align-items:center; gap:1rem; text-decoration:none; color:var(--text-dim); font-size:0.9rem; padding:0.8rem 1.2rem; border:1px solid var(--border); background:var(--bg2); transition:border-color 0.3s,color 0.3s; }
+  .contact-link:hover { border-color:var(--cyan); color:var(--cyan); }
+  .contact-link-icon { font-family:'Share Tech Mono',monospace; font-size:0.7rem; color:var(--cyan); width:80px; flex-shrink:0; }
+  .contact-form { display:flex; flex-direction:column; gap:0.8rem; }
+  .form-group { display:flex; flex-direction:column; gap:0.4rem; }
+  .form-label { font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:var(--text-dim); letter-spacing:0.2em; text-transform:uppercase; }
+  .form-input,.form-textarea { background:var(--bg2); border:1px solid var(--border); color:var(--text); padding:0.8rem 1rem; font-family:'Exo 2',sans-serif; font-size:0.88rem; font-weight:300; outline:none; transition:border-color 0.3s; width:100%; }
+  .form-input:focus,.form-textarea:focus { border-color:var(--cyan); }
+  .form-textarea { height:100px; resize:vertical; }
+
+  footer { position:relative; z-index:10; border-top:1px solid var(--border); padding:2rem 4rem; display:flex; justify-content:space-between; align-items:center; }
+  .footer-logo { font-family:'Share Tech Mono',monospace; font-size:0.75rem; color:var(--text-dim); letter-spacing:0.3em; }
+  .footer-copy { font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:var(--text-dim); opacity:0.5; }
+
+  @media (max-width:1024px) {
+    nav{padding:1rem 2rem;} section{padding:0 2rem;} footer{padding:2rem;}
+    .projects-grid{grid-template-columns:1fr 1fr;} .hero-hex{display:none;}
+    .about-grid,.contact-grid{grid-template-columns:1fr;gap:2rem;}
+  }
+  @media (max-width:640px) {
+    .nav-links{display:none;} .projects-grid{grid-template-columns:1fr;}
+    .hero-actions{flex-direction:column;} .hero-stats{gap:1.5rem;}
+  }
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-dot"></div>
+<canvas id="starfield"></canvas>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">DP<span>.</span>PORTFOLIO</div>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#education">Education</a></li>
+    <li><a href="#ai-chat">AI Chat</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="nav-status">
+    <div class="status-dot"></div>
+    OPEN TO OPPORTUNITIES
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-label">// SOFTWARE ENGINEER — PORTFOLIO v1.0</div>
+  <h1 class="hero-name">
+    <span class="glitch" data-text="DEEVYA">DEEVYA</span><br>
+    <span class="cyan glitch" data-text="PATEL">PATEL</span>
+  </h1>
+  <div class="hero-subtitle">FULL STACK // CLOUD // AI-POWERED APPS</div>
+  <p class="hero-desc">
+    Computer Science student at UNT building real-world systems — from encrypted messaging to AI task management. AWS certified. Shipping production-grade code since 2021.
+  </p>
+  <div class="hero-badges">
+    <span class="badge">⬡ AWS Certified Developer</span>
+    <span class="badge">⬡ GPA 3.72</span>
+    <span class="badge">⬡ Dean's List</span>
+    <span class="badge">⬡ Eagle Scholar</span>
+  </div>
+  <div class="hero-actions">
+    <button class="btn-primary" onclick="document.getElementById('projects').scrollIntoView({behavior:'smooth'})">VIEW PROJECTS</button>
+    <button class="btn-secondary" onclick="document.getElementById('ai-chat').scrollIntoView({behavior:'smooth'})">TALK TO MY AI</button>
+  </div>
+  <div class="hero-stats">
+    <div class="stat-item">
+      <div class="stat-num" id="counter-gpa">0</div>
+      <div class="stat-label">GPA</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" id="counter-projects">0</div>
+      <div class="stat-label">Projects Shipped</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" id="counter-latency">0</div>
+      <div class="stat-label">% Latency Cut</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" id="counter-users">0</div>
+      <div class="stat-label">Test Users</div>
+    </div>
+  </div>
+  <div class="scroll-indicator">
+    <div class="scroll-text">SCROLL</div>
+    <div class="scroll-line"></div>
+  </div>
+
+  <!-- Hex decoration -->
+  <svg class="hero-hex" viewBox="0 0 380 380" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g style="transform-origin:190px 190px;animation:spin 30s linear infinite;">
+      <polygon points="190,20 340,107.5 340,272.5 190,360 40,272.5 40,107.5" stroke="rgba(0,245,255,0.15)" stroke-width="1" fill="none"/>
+    </g>
+    <g style="transform-origin:190px 190px;animation:spinRev 20s linear infinite;">
+      <polygon points="190,50 310,120 310,260 190,330 70,260 70,120" stroke="rgba(0,245,255,0.1)" stroke-width="1" fill="none" stroke-dasharray="4 8"/>
+    </g>
+    <g style="transform-origin:190px 190px;animation:spin 15s linear infinite;">
+      <polygon points="190,85 280,137.5 280,242.5 190,295 100,242.5 100,137.5" stroke="rgba(255,0,110,0.2)" stroke-width="1" fill="none"/>
+    </g>
+    <circle cx="190" cy="190" r="60" stroke="rgba(0,245,255,0.08)" stroke-width="1" fill="rgba(0,245,255,0.02)"/>
+    <text x="190" y="185" text-anchor="middle" font-family="Share Tech Mono" font-size="10" fill="rgba(0,245,255,0.5)" letter-spacing="2">AWS CERT</text>
+    <text x="190" y="200" text-anchor="middle" font-family="Share Tech Mono" font-size="10" fill="rgba(0,245,255,0.5)" letter-spacing="2">FULL STACK</text>
+    <circle cx="190" cy="20" r="3" fill="rgba(0,245,255,0.5)"/>
+    <circle cx="340" cy="107.5" r="3" fill="rgba(0,245,255,0.5)"/>
+    <circle cx="340" cy="272.5" r="3" fill="rgba(0,245,255,0.5)"/>
+    <circle cx="190" cy="360" r="3" fill="rgba(0,245,255,0.5)"/>
+    <circle cx="40" cy="272.5" r="3" fill="rgba(0,245,255,0.5)"/>
+    <circle cx="40" cy="107.5" r="3" fill="rgba(0,245,255,0.5)"/>
+    <circle cx="190" cy="85" r="2.5" fill="rgba(255,0,110,0.6)"/>
+    <circle cx="280" cy="137.5" r="2.5" fill="rgba(255,0,110,0.6)"/>
+    <circle cx="280" cy="242.5" r="2.5" fill="rgba(255,0,110,0.6)"/>
+    <circle cx="190" cy="295" r="2.5" fill="rgba(255,0,110,0.6)"/>
+    <circle cx="100" cy="242.5" r="2.5" fill="rgba(255,0,110,0.6)"/>
+    <circle cx="100" cy="137.5" r="2.5" fill="rgba(255,0,110,0.6)"/>
+  </svg>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-header">
+    <span class="section-number">01</span>
+    <div class="section-line"></div>
+    <h2 class="section-title">ABOUT</h2>
+  </div>
+  <div class="about-grid">
+    <div class="about-text">
+      <p>I'm a Computer Science student at the <strong>University of North Texas</strong> (graduating Dec 2026) with a minor in Business Computer Information Systems and a GPA of <strong>3.72</strong>.</p>
+      <p>I build full-stack applications end to end — from <strong>REST API design</strong> and authentication flows to cloud deployment on <strong>AWS EC2</strong>. My capstone project served 500+ test users in production.</p>
+      <p>Currently holding an <strong>AWS Certified Developer – Associate</strong> certification. I thrive in Agile teams and care deeply about clean code, performance, and real user impact.</p>
+    </div>
+    <div class="skills-grid">
+      <div class="skill-tag hot">React.js</div>
+      <div class="skill-tag hot">TypeScript</div>
+      <div class="skill-tag">Python</div>
+      <div class="skill-tag">JavaScript</div>
+      <div class="skill-tag">Node.js</div>
+      <div class="skill-tag hot">AWS</div>
+      <div class="skill-tag">React Native</div>
+      <div class="skill-tag">Expo</div>
+      <div class="skill-tag">SQL</div>
+      <div class="skill-tag">REST APIs</div>
+      <div class="skill-tag">Socket.io</div>
+      <div class="skill-tag">JWT / Auth</div>
+      <div class="skill-tag">C++</div>
+      <div class="skill-tag">Bootstrap</div>
+      <div class="skill-tag">Git / GitHub</div>
+      <div class="skill-tag hot">CI/CD</div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="section-header">
+    <span class="section-number">02</span>
+    <div class="section-line"></div>
+    <h2 class="section-title">PROJECTS</h2>
+  </div>
+  <div class="projects-grid">
+    <div class="project-card">
+      <div class="project-number">PROJECT_001 // CAPSTONE</div>
+      <div class="project-title">Prioritize</div>
+      <p class="project-desc">AI-based task management app. Led API development for a 5-person Agile team — reduced data fetch time by 30%, boosted on-time task completion by 40% in user testing. Served 500+ test users.</p>
+      <div class="project-tags">
+        <span class="ptag">React Native</span><span class="ptag">Expo</span><span class="ptag">TypeScript</span><span class="ptag">REST APIs</span><span class="ptag">Git</span>
+      </div>
+      <span class="coming-soon">// COMING SOON</span>
+    </div>
+    <div class="project-card">
+      <div class="project-number">PROJECT_002</div>
+      <div class="project-title">SecureChat</div>
+      <p class="project-desc">Real-time encrypted messaging app with JWT auth and end-to-end encryption. Sub-100ms message delivery, 1,000+ simulated requests with 99% uptime. Deployed on AWS EC2.</p>
+      <div class="project-tags">
+        <span class="ptag">Node.js</span><span class="ptag">React.js</span><span class="ptag">Socket.io</span><span class="ptag">JWT</span><span class="ptag">SQL</span><span class="ptag">AWS EC2</span>
+      </div>
+      <span class="coming-soon">// COMING SOON</span>
+    </div>
+    <div class="project-card">
+      <div class="project-number">PROJECT_003</div>
+      <div class="project-title">MUVA Website</div>
+      <p class="project-desc">Fully responsive website with Python backend for dynamic content rendering. Reduced page load time by 22%. Cross-browser compatible across 4 major browsers, 35% increase in mobile engagement.</p>
+      <div class="project-tags">
+        <span class="ptag">HTML</span><span class="ptag">CSS</span><span class="ptag">Bootstrap</span><span class="ptag">JavaScript</span><span class="ptag">Python</span>
+      </div>
+      <span class="coming-soon">// COMING SOON</span>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="section-header">
+    <span class="section-number">03</span>
+    <div class="section-line"></div>
+    <h2 class="section-title">EXPERIENCE</h2>
+  </div>
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-date">MAY 2024 — AUG 2024</div>
+      <div class="timeline-role">Software Engineer Intern</div>
+      <div class="timeline-company">Motorola Solutions — Remote / Dallas, TX</div>
+      <div class="timeline-desc">
+        Built and optimized backend components in React and C++, improving system performance by 20% and cutting API response latency by 15%. Developed internal tooling that automated reporting workflows, saving the team 5+ hours per week. Collaborated across 3 engineering squads in Agile/Scrum and contributed to code reviews and documentation for 10+ modules.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EDUCATION -->
+<section id="education">
+  <div class="section-header">
+    <span class="section-number">04</span>
+    <div class="section-line"></div>
+    <h2 class="section-title">EDUCATION</h2>
+  </div>
+  <div class="edu-card">
+    <div class="edu-degree">B.S. in Computer Science</div>
+    <div class="edu-school">University of North Texas — Denton, TX</div>
+    <div class="edu-meta">
+      <div class="edu-item">TIMELINE // <strong>AUG 2021 – DEC 2026</strong></div>
+      <div class="edu-item">GPA // <strong>3.72</strong></div>
+      <div class="edu-item">MINOR // <strong>Business CIS</strong></div>
+    </div>
+    <div class="honors">
+      <span class="honor-tag">President's List — Spring 2021</span>
+      <span class="honor-tag">Dean's List — Fall 2024</span>
+      <span class="honor-tag">Dean's List — Spring 2025</span>
+      <span class="honor-tag">Dean's List — Fall 2025</span>
+      <span class="honor-tag">Eagle Scholar Recipient</span>
+      <span class="honor-tag">AWS Certified Developer – Associate</span>
+    </div>
+  </div>
+</section>
+
+<!-- AI CHATBOT -->
+<section id="ai-chat">
+  <div class="section-header">
+    <span class="section-number">05</span>
+    <div class="section-line"></div>
+    <h2 class="section-title">AI INTERFACE</h2>
+  </div>
+  <p style="color:var(--text-dim);font-size:0.9rem;margin-bottom:1.5rem;max-width:600px;">
+    Powered by Claude. Ask anything about my skills, projects, experience, or availability.
+  </p>
+  <div class="chat-container">
+    <div class="chat-header">
+      <div class="chat-header-icon">⬡</div>
+      <div>
+        <div class="chat-header-title">DEEVYA.AI // NEURAL INTERFACE</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--text-dim);margin-top:2px;">ASK ME ANYTHING</div>
+      </div>
+      <div class="chat-header-sub">CLAUDE-POWERED</div>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="msg assistant">
+        <div class="msg-label">DEEVYA.AI</div>
+        <div class="msg-bubble">Hello. I'm Deevya's AI interface, built on Claude. I have full context on her CS background, projects, internship at Motorola, and what she's looking for next. What would you like to know?</div>
+      </div>
+    </div>
+    <div class="chat-suggestions">
+      <button class="suggest-btn" onclick="sendSuggest(this)">What's your tech stack?</button>
+      <button class="suggest-btn" onclick="sendSuggest(this)">Tell me about Prioritize</button>
+      <button class="suggest-btn" onclick="sendSuggest(this)">Are you open to internships?</button>
+      <button class="suggest-btn" onclick="sendSuggest(this)">What did you do at Motorola?</button>
+    </div>
+    <div class="chat-input-row">
+      <input type="text" class="chat-input" id="chatInput" placeholder="TRANSMIT MESSAGE..." maxlength="300" />
+      <button class="chat-send" id="chatSend" onclick="sendMessage()">SEND</button>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-header">
+    <span class="section-number">06</span>
+    <div class="section-line"></div>
+    <h2 class="section-title">CONTACT</h2>
+  </div>
+  <div class="contact-grid">
+    <div>
+      <p class="contact-text">
+        Open to software engineering internships, new grad roles, and collaborative projects. 
+        I respond quickly — usually within a day.
+      </p>
+      <div class="contact-links">
+        <a href="/cdn-cgi/l/email-protection#37535252414e56475643525b0507070477505a565e5b1954585a" class="contact-link">
+          <span class="contact-link-icon">EMAIL //</span>
+          <span class="__cf_email__" data-cfemail="d2b6b7b7a4abb3a2b3a6b7bee0e2e2e192b5bfb3bbbefcb1bdbf">[email&#160;protected]</span>
+        </a>
+        <a href="https://linkedin.com/in/DeevyaPatel" target="_blank" class="contact-link">
+          <span class="contact-link-icon">LINKEDIN //</span>
+          linkedin.com/in/DeevyaPatel
+        </a>
+        <a href="https://github.com/DeevyaPatel" target="_blank" class="contact-link">
+          <span class="contact-link-icon">GITHUB //</span>
+          github.com/DeevyaPatel
+        </a>
+        <a href="tel:4694637893" class="contact-link">
+          <span class="contact-link-icon">PHONE //</span>
+          (469) 463-7893
+        </a>
+      </div>
+    </div>
+    <div class="contact-form">
+      <div class="form-group">
+        <label class="form-label">NAME</label>
+        <input type="text" id="contactName" class="form-input" placeholder="Your name" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">EMAIL</label>
+        <input type="email" id="contactEmail" class="form-input" placeholder="your@email.com" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">MESSAGE</label>
+        <textarea id="contactMessage" class="form-textarea" placeholder="Tell me about the opportunity..."></textarea>
+      </div>
+      <button class="btn-primary" style="width:100%;margin-top:0.5rem;" id="contactBtn" onclick="submitContact()">TRANSMIT MESSAGE</button>
+      <div id="contactStatus" style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;margin-top:0.6rem;display:none;"></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">DP.PORTFOLIO — 2026</div>
+  <div class="footer-copy">BUILT WITH PRECISION // UNT CS // ALL SYSTEMS NOMINAL</div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// Custom cursor
+const cursor = document.getElementById('cursor');
+const cursorDot = document.getElementById('cursor-dot');
+document.addEventListener('mousemove', e => {
+  cursor.style.left = e.clientX + 'px';
+  cursor.style.top = e.clientY + 'px';
+  cursorDot.style.left = e.clientX + 'px';
+  cursorDot.style.top = e.clientY + 'px';
+});
+
+// Starfield
+const canvas = document.getElementById('starfield');
+const ctx = canvas.getContext('2d');
+let stars = [], W, H;
+function initStars() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  stars = [];
+  for (let i = 0; i < 200; i++) {
+    stars.push({ x:Math.random()*W, y:Math.random()*H, r:Math.random()*1.5, o:Math.random(), speed:Math.random()*0.3+0.05, drift:(Math.random()-0.5)*0.1 });
+  }
+}
+function animStars() {
+  ctx.clearRect(0,0,W,H);
+  stars.forEach(s => {
+    ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(0,245,255,${s.o*0.6})`; ctx.fill();
+    s.y+=s.speed; s.x+=s.drift;
+    if(s.y>H){s.y=0;s.x=Math.random()*W;}
+    if(s.x>W||s.x<0) s.drift*=-1;
+    s.o+=(Math.random()-0.5)*0.02; s.o=Math.max(0.1,Math.min(1,s.o));
+  });
+  requestAnimationFrame(animStars);
+}
+window.addEventListener('resize', initStars);
+initStars(); animStars();
+
+// Counters
+function animateCounter(id, target, suffix='', duration=2000, decimals=0) {
+  const el = document.getElementById(id); if(!el) return;
+  let start=0; const step=(target/duration)*16;
+  const timer = setInterval(()=>{
+    start+=step;
+    if(start>=target){ el.textContent=decimals?target.toFixed(decimals):target+suffix; clearInterval(timer); }
+    else el.textContent = decimals ? start.toFixed(decimals) : Math.floor(start)+suffix;
+  },16);
+}
+setTimeout(()=>{
+  animateCounter('counter-gpa', 3.72, '', 2000, 2);
+  animateCounter('counter-projects', 3, '+');
+  animateCounter('counter-latency', 30, '%');
+  animateCounter('counter-users', 500, '+');
+},1400);
+
+// ── AI CHATBOT ──
+let chatHistory = [];
+let isTyping = false;
+
+function appendMsg(role, text) {
+  const box = document.getElementById('chatMessages');
+  const d = document.createElement('div');
+  d.className = 'msg ' + role;
+  d.innerHTML = `<div class="msg-label">${role==='user'?'YOU':'DEEVYA.AI'}</div><div class="msg-bubble">${text}</div>`;
+  box.appendChild(d); box.scrollTop = box.scrollHeight;
+}
+function showTyping() {
+  const box = document.getElementById('chatMessages');
+  const d = document.createElement('div');
+  d.className='msg assistant'; d.id='typing-msg';
+  d.innerHTML=`<div class="msg-label">DEEVYA.AI</div><div class="typing-indicator"><span></span><span></span><span></span></div>`;
+  box.appendChild(d); box.scrollTop=box.scrollHeight;
+}
+function removeTyping() { const t=document.getElementById('typing-msg'); if(t) t.remove(); }
+
+async function sendMessage() {
+  if(isTyping) return;
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim(); if(!text) return;
+  input.value=''; appendMsg('user', text);
+  chatHistory.push({role:'user',content:text});
+  isTyping=true; document.getElementById('chatSend').disabled=true; showTyping();
+  try {
+    const res = await fetch('/.netlify/functions/chat', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ messages: chatHistory })
+    });
+    const data = await res.json();
+    const reply = data.reply || data.error || 'Signal lost. Try again.';
+    chatHistory.push({role:'assistant',content:reply});
+    removeTyping(); appendMsg('assistant', reply);
+  } catch(e) { removeTyping(); appendMsg('assistant','Connection error. Please try again.'); }
+  isTyping=false; document.getElementById('chatSend').disabled=false;
+}
+function sendSuggest(btn) { document.getElementById('chatInput').value=btn.textContent; sendMessage(); }
+document.getElementById('chatInput').addEventListener('keydown', e=>{ if(e.key==='Enter') sendMessage(); });
+
+// ── CONTACT FORM ──
+async function submitContact() {
+  const name = document.getElementById('contactName').value.trim();
+  const email = document.getElementById('contactEmail').value.trim();
+  const message = document.getElementById('contactMessage').value.trim();
+  const btn = document.getElementById('contactBtn');
+  const status = document.getElementById('contactStatus');
+
+  if(!name || !email || !message) {
+    status.style.color='#ff006e'; status.textContent='// ALL FIELDS REQUIRED'; return;
+  }
+
+  btn.disabled=true; btn.textContent='TRANSMITTING...';
+  status.style.color='var(--cyan)'; status.textContent='// SENDING...';
+
+  try {
+    const res = await fetch('/.netlify/functions/contact', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ name, email, message })
+    });
+    const data = await res.json();
+    if(data.success) {
+      status.style.color='#00ff88'; status.textContent='// MESSAGE TRANSMITTED — CHECK YOUR EMAIL FOR CONFIRMATION';
+      document.getElementById('contactName').value='';
+      document.getElementById('contactEmail').value='';
+      document.getElementById('contactMessage').value='';
+      btn.textContent='SENT ✓';
+    } else {
+      status.style.color='#ff006e'; status.textContent='// ERROR: ' + (data.error||'Try again.');
+      btn.disabled=false; btn.textContent='TRANSMIT MESSAGE';
+    }
+  } catch(e) {
+    status.style.color='#ff006e'; status.textContent='// CONNECTION ERROR — TRY AGAIN';
+    btn.disabled=false; btn.textContent='TRANSMIT MESSAGE';
+  }
+}
+</script>
+</body>
+</html>
